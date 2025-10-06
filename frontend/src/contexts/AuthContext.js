@@ -18,6 +18,7 @@ import {
     serverTimestamp,
     collection,
     query,
+    addDoc,
     where,
     getDocs
 } from 'firebase/firestore';
@@ -86,6 +87,26 @@ export const AuthProvider = ({ children }) => {
 
             await setDoc(doc(db, 'users', user.uid), userDocData);
 
+            // Handle admin request if user selected admin role
+            if (userData.adminRequest) {
+                const adminRequestData = {
+                    userId: user.uid,
+                    name: userData.name,
+                    email: user.email,
+                    phone: userData.phoneNumber || '',
+                    currentRole: 'staff',
+                    reason: userData.adminRequest.reason,
+                    department: userData.department,
+                    experience: '',
+                    additionalInfo: 'Requested during signup',
+                    status: 'pending',
+                    createdAt: serverTimestamp(),
+                    requestedAt: new Date().toISOString()
+                };
+
+                await addDoc(collection(db, 'adminRequests'), adminRequestData);
+            }
+
             // Create user activity log
             await setDoc(doc(db, 'user_activities', user.uid), {
                 userId: user.uid,
@@ -94,7 +115,8 @@ export const AuthProvider = ({ children }) => {
                     timestamp: serverTimestamp(),
                     details: {
                         email: user.email,
-                        role: userData.role
+                        role: userData.role,
+                        hasAdminRequest: !!userData.adminRequest
                     }
                 }]
             });

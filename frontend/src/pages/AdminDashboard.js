@@ -6,7 +6,9 @@ import {
     BarChart3,
     Bell,
     AlertTriangle,
-    CheckCircle
+    CheckCircle,
+    MessageCircle,
+    Shield
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import StatsCard from '../components/StatsCard';
@@ -16,6 +18,8 @@ import AddStaffModal from '../components/AddStaffModal';
 import UserManagement from '../components/UserManagement';
 import ShiftManagement from '../components/ShiftManagement';
 import LeaveManagement from '../components/LeaveManagement';
+import ChatSystem from '../components/ChatSystem';
+import AdminApproval from '../components/AdminApproval';
 import { useAuth } from '../contexts/AuthContext';
 import { shiftService, leaveService, userService } from '../services/dataService';
 // import autoAssignService from '../services/autoAssignService';
@@ -26,6 +30,8 @@ const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const [showAddShift, setShowAddShift] = useState(false);
     const [showAddStaff, setShowAddStaff] = useState(false);
+    const [showChat, setShowChat] = useState(false);
+    const [isChatMinimized, setIsChatMinimized] = useState(false);
     const [dashboardData, setDashboardData] = useState({
         stats: {
             totalStaff: 0,
@@ -160,7 +166,9 @@ const AdminDashboard = () => {
         { id: 'overview', label: 'Overview', icon: BarChart3 },
         { id: 'shifts', label: 'Shifts', icon: Calendar },
         { id: 'staff', label: 'Staff', icon: Users },
-        { id: 'requests', label: 'Requests', icon: Bell }
+        { id: 'requests', label: 'Requests', icon: Bell },
+        { id: 'chat', label: 'Team Chat', icon: MessageCircle },
+        { id: 'admin-approval', label: 'Admin Approval', icon: Shield }
     ];
 
     if (loading) {
@@ -348,6 +356,62 @@ const AdminDashboard = () => {
                         <LeaveManagement />
                     )}
 
+                    {activeTab === 'chat' && (
+                        <div className="space-y-6">
+                            <div className="card">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-medical-dark">Team Communication</h3>
+                                        <p className="text-sm text-medical-gray">Real-time messaging for your healthcare team</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setShowChat(true)}
+                                        className="px-4 py-2 bg-medical-primary text-white rounded-lg hover:bg-medical-dark transition-colors flex items-center space-x-2"
+                                    >
+                                        <MessageCircle className="w-4 h-4" />
+                                        <span>Open Chat</span>
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="bg-blue-50 p-4 rounded-lg">
+                                        <div className="flex items-center space-x-3 mb-2">
+                                            <div className="p-2 bg-blue-100 rounded-lg">
+                                                <MessageCircle className="w-5 h-5 text-blue-600" />
+                                            </div>
+                                            <h4 className="font-semibold text-blue-900">General Chat</h4>
+                                        </div>
+                                        <p className="text-sm text-blue-700">Team discussions and general communication</p>
+                                    </div>
+
+                                    <div className="bg-red-50 p-4 rounded-lg">
+                                        <div className="flex items-center space-x-3 mb-2">
+                                            <div className="p-2 bg-red-100 rounded-lg">
+                                                <AlertTriangle className="w-5 h-5 text-red-600" />
+                                            </div>
+                                            <h4 className="font-semibold text-red-900">Urgent Messages</h4>
+                                        </div>
+                                        <p className="text-sm text-red-700">Critical updates requiring immediate attention</p>
+                                    </div>
+
+                                    <div className="bg-green-50 p-4 rounded-lg">
+                                        <div className="flex items-center space-x-3 mb-2">
+                                            <div className="p-2 bg-green-100 rounded-lg">
+                                                <Clock className="w-5 h-5 text-green-600" />
+                                            </div>
+                                            <h4 className="font-semibold text-green-900">Shift Updates</h4>
+                                        </div>
+                                        <p className="text-sm text-green-700">Schedule changes and shift notifications</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'admin-approval' && (
+                        <AdminApproval />
+                    )}
+
                 </div>
             </div>
 
@@ -365,6 +429,17 @@ const AdminDashboard = () => {
                     isOpen={showAddStaff}
                     onClose={() => setShowAddStaff(false)}
                     onSuccess={fetchDashboardData}
+                />
+            )}
+
+            {/* Chat System */}
+            {showChat && (
+                <ChatSystem
+                    isOpen={showChat}
+                    onClose={() => setShowChat(false)}
+                    isMinimized={isChatMinimized}
+                    onMinimize={() => setIsChatMinimized(!isChatMinimized)}
+                    onMaximize={() => setIsChatMinimized(false)}
                 />
             )}
         </div>

@@ -116,9 +116,10 @@ const SignupPage = () => {
         setIsLoading(true);
 
         try {
+            // Always create as staff user
             await signup(formData.email, formData.password, {
                 name: formData.name,
-                role: formData.role,
+                role: 'staff',
                 department: formData.department,
                 skills: formData.skills
             });
@@ -318,6 +319,7 @@ const SignupPage = () => {
                             </select>
                         </div>
                     </div>
+
 
                     {/* Skills Selection */}
                     <div>
