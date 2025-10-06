@@ -1,0 +1,28 @@
+{
+  "name": "shiftcheck-healthcare-manager",
+  "version": "1.0.0",
+  "description": "Modern Healthcare Shift Management Platform - ShiftCheck",
+  "main": "backend/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "install-all": "cd frontend && npm install && cd ../backend && npm install",
+    "start": "npm run dev",
+    "deploy:firebase": "node scripts/deploy-firebase.js",
+    "deploy:staging": "firebase use staging && npm run deploy:firebase",
+    "deploy:production": "firebase use default && npm run deploy:firebase",
+    "firebase:init": "firebase init",
+    "firebase:login": "firebase login",
+    "firebase:serve": "firebase serve --only hosting",
+    "firebase:emulators": "firebase emulators:start"
+  },
+  "keywords": ["healthcare", "shift-management", "react", "nodejs", "mongodb"],
+  "author": "ShiftCheck Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Cross-browser theme color support -->
+    <meta name="msapplication-navbutton-color" content="#2563eb" />
+    <meta name="msapplication-TileColor" content="#2563eb" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="ShiftCheck" />
+    <meta
+      name="description"
+      content="ShiftCheck - Modern Healthcare Shift Management Platform. Streamline your healthcare facility's scheduling with AI-powered automation, real-time collaboration, and intelligent workforce optimization."
+    />
+    <meta
+      name="keywords"
+      content="healthcare, shift management, hospital scheduling, medical staff, workforce management, healthcare technology"
+    />
+    <meta name="author" content="ShiftCheck Team" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://shiftcheck.app/" />
+    <meta
+      property="og:title"
+      content="ShiftCheck - Healthcare Shift Management Platform"
+    />
+    <meta
+      property="og:description"
+      content="Revolutionize your healthcare facility's workforce management with intelligent scheduling, real-time notifications, and advanced analytics."
+    />
+    <meta property="og:image" content="%PUBLIC_URL%/og-image.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://shiftcheck.app/" />
+    <meta
+      property="twitter:title"
+      content="ShiftCheck - Healthcare Shift Management Platform"
+    />
+    <meta
+      property="twitter:description"
+      content="Revolutionize your healthcare facility's workforce management with intelligent scheduling, real-time notifications, and advanced analytics."
+    />
+    <meta property="twitter:image" content="%PUBLIC_URL%/twitter-image.png" />
+
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Favicon variations -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="%PUBLIC_URL%/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="%PUBLIC_URL%/favicon-16x16.png"
+    />
+
+    <title>ShiftCheck - Healthcare Shift Management Platform</title>
+
+    <style>
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #2563eb 0%, #059669 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        color: white;
+        font-family: "Inter", sans-serif;
+      }
+
+      .loading-logo {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .loading-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .loading-icon svg {
+        color: #2563eb;
+      }
+
+      .loading-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .loading-text {
+        margin-top: 20px;
+        opacity: 0.8;
+      }
+
+      .loading-brand-accent {
+        color: #10b981;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "ShiftCheck",
+        "description": "Modern Healthcare Shift Management Platform with AI-powered automation and real-time collaboration",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "ratingCount": "150"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <div
+        style="
+          text-align: center;
+          padding: 50px;
+          font-family: Arial, sans-serif;
+        "
+      >
+        <h1>ShiftCheck - Healthcare Shift Management</h1>
+        <p>You need to enable JavaScript to run this app.</p>
+        <p>
+          ShiftCheck is a modern healthcare shift management platform that
+          requires JavaScript for optimal functionality.
+        </p>
+      </div>
+    </noscript>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <div class="loading-logo">
+        <div class="loading-icon">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
+            <path d="M9 12l2 2 4-4" />
+          </svg>
+        </div>
+        <h1 class="loading-title">
+          Shift<span class="loading-brand-accent">Check</span>
+        </h1>
+      </div>
+
+      <div class="loading-spinner"></div>
+
+      <p class="loading-text">Loading your healthcare management platform...</p>
+    </div>
+
+    <style>
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Hide loading screen when React app loads */
+      .app-loaded #loading-screen {
+        display: none;
+      }
+    </style>
+
+    <div id="root"></div>
+
+    <!-- Hide loading screen when React loads -->
+    <script>
+      window.addEventListener("load", function () {
+        setTimeout(function () {
+          const loadingScreen = document.getElementById("loading-screen");
+          if (loadingScreen) {
+            loadingScreen.style.opacity = "0";
+            loadingScreen.style.transition = "opacity 0.5s ease-out";
+            setTimeout(function () {
+              loadingScreen.style.display = "none";
+            }, 500);
+          }
+        }, 1000); // Show loading for at least 1 second
+      });
+    </script>
+  </body>
+</html>

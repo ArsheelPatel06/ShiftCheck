@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "healthcare-shift-manager-prod",
+    "development": "healthcare-shift-manager-dev",
+    "staging": "healthcare-shift-manager-staging"
+  },
+  "targets": {},
+  "etags": {}
+}

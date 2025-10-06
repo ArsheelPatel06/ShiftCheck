@@ -1,0 +1,56 @@
+{
+  "name": "shiftcheck-client",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.5.2",
+    "autoprefixer": "^10.4.15",
+    "dotenv": "^17.2.3",
+    "firebase": "^10.14.1",
+    "gsap": "^3.13.0",
+    "lucide-react": "^0.279.0",
+    "postcss": "^8.4.29",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.6.0",
+    "react-router-dom": "^6.15.0",
+    "react-scripts": "5.0.1",
+    "tailwindcss": "^3.3.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "node scripts/inject-env.js && react-scripts build",
+    "build:secure": "node scripts/inject-env.js && react-scripts build",
+    "build:optimized": "node scripts/inject-env.js && react-scripts build && node scripts/optimize-build.js",
+    "analyze": "npm run build && npx webpack-bundle-analyzer build/static/js/*.js",
+    "optimize": "node scripts/optimize-build.js",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "eslint-config-react-app": "^7.0.1",
+    "webpack-bundle-analyzer": "^4.10.2"
+  }
+}
