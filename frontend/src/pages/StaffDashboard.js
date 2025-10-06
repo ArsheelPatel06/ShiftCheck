@@ -12,8 +12,7 @@ import {
     Trash2,
     Eye,
     Download,
-    MessageCircle,
-    Shield
+    MessageCircle
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import StatsCard from '../components/StatsCard';

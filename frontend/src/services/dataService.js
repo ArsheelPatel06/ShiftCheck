@@ -360,6 +360,7 @@ export const userService = {
     getById: (id) => dataService.getById('users', id),
     update: (id, userData) => dataService.update('users', id, userData),
     delete: (id) => dataService.delete('users', id),
+    deleteCompletely: (id) => firebaseUserService.deleteUserCompletely(id),
     subscribe: (callback, filters) => dataService.subscribe('users', callback, filters),
 
     // User-specific methods

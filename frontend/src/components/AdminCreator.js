@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp, addDoc, collection } from 'firebase/firestore';
+import { doc, setDoc, addDoc, collection } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 import { User, Mail, Lock, UserPlus, X, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -39,9 +39,12 @@ const AdminCreator = ({ isOpen, onClose }) => {
     setIsLoading(true);
 
     try {
+      console.log('Creating user in Firebase Auth...');
       // Create user in Firebase Auth
       const { user } = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      console.log('User created in Auth:', user.uid);
 
+      console.log('Creating user document in Firestore...');
       // Create user as staff first and create admin request
       await setDoc(doc(db, 'users', user.uid), {
         name: formData.name,
@@ -49,11 +52,13 @@ const AdminCreator = ({ isOpen, onClose }) => {
         role: 'staff', // Start as staff
         department: 'Management',
         status: 'active',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       });
+      console.log('User document created successfully');
 
-      // Create admin request
+      // Create admin request for approval
+      console.log('Creating admin request...');
       const adminRequestData = {
         userId: user.uid,
         name: formData.name,
@@ -65,14 +70,16 @@ const AdminCreator = ({ isOpen, onClose }) => {
         experience: '',
         additionalInfo: 'Created through admin creation process',
         status: 'pending',
-        createdAt: serverTimestamp(),
+        createdAt: new Date().toISOString(),
         requestedAt: new Date().toISOString()
       };
 
+      console.log('Admin request data:', adminRequestData);
       await addDoc(collection(db, 'adminRequests'), adminRequestData);
+      console.log('Admin request created successfully');
 
       setShowSuccessMessage(true);
-      toast.success('Admin request has been sent for approval!');
+      toast.success('Admin account created! Request sent for approval.');
     } catch (error) {
       console.error('Error creating user:', error);
       toast.error('Failed to create user: ' + error.message);

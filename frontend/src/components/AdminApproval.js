@@ -3,20 +3,18 @@ import {
     Users,
     CheckCircle,
     XCircle,
-    Clock,
-    AlertTriangle,
     Shield,
     Mail,
     Phone,
     Calendar,
-    Eye,
     UserCheck,
     UserX
 } from 'lucide-react';
-import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, orderBy, addDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, doc, updateDoc, addDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import firebaseErrorHandler from '../utils/firebaseErrorHandler';
 
 const AdminApproval = () => {
     const { currentUser, userProfile } = useAuth();
@@ -32,19 +30,31 @@ const AdminApproval = () => {
     const fetchPendingRequests = useCallback(() => {
         try {
             const requestsRef = collection(db, 'adminRequests');
-            const q = query(
-                requestsRef,
-                where('status', '==', 'pending'),
-                orderBy('createdAt', 'desc')
-            );
+            // Simplified query - get all requests and filter client-side
+            const q = query(requestsRef);
 
             const unsubscribe = onSnapshot(q, (snapshot) => {
-                const requests = snapshot.docs.map(doc => ({
+                const allRequests = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data(),
-                    createdAt: doc.data().createdAt?.toDate() || new Date()
+                    createdAt: doc.data().createdAt?.toDate() || new Date(doc.data().requestedAt) || new Date()
                 }));
-                setPendingRequests(requests);
+
+                // Filter for pending requests and sort by requestedAt
+                const pendingRequests = allRequests
+                    .filter(request => request.status === 'pending')
+                    .sort((a, b) => {
+                        const dateA = new Date(a.requestedAt || a.createdAt);
+                        const dateB = new Date(b.requestedAt || b.createdAt);
+                        return dateB - dateA; // Descending order
+                    });
+
+                setPendingRequests(pendingRequests);
+                setLoading(false);
+            }, (error) => {
+                firebaseErrorHandler.handle(error, 'Fetching admin requests', {
+                    returnValue: null
+                });
                 setLoading(false);
             });
 

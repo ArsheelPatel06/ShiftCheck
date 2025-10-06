@@ -70,6 +70,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess, leaveRequest, isViewing
             // Prepare leave request data
             const leaveData = {
                 ...formData,
+                userId: userProfile.id, // Add userId field for permission checking
                 status: 'pending',
                 requestedBy: {
                     id: userProfile.id,

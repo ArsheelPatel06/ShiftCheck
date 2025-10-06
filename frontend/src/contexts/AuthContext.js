@@ -86,6 +86,14 @@ export const AuthProvider = ({ children }) => {
             };
 
             await setDoc(doc(db, 'users', user.uid), userDocData);
+            console.log('User document created successfully in Firestore');
+
+            // Verify the document was created
+            const verifyDoc = await getDoc(doc(db, 'users', user.uid));
+            if (!verifyDoc.exists()) {
+                throw new Error('Failed to create user document in Firestore');
+            }
+            console.log('User document verified in Firestore');
 
             // Handle admin request if user selected admin role
             if (userData.adminRequest) {
@@ -361,9 +369,20 @@ export const AuthProvider = ({ children }) => {
             if (userDoc.exists()) {
                 return { id: userDoc.id, ...userDoc.data() };
             }
+            console.warn('User document does not exist for UID:', uid);
             return null;
         } catch (error) {
             console.error('Error fetching user data:', error);
+
+            // Handle specific Firebase errors
+            if (error.code === 'permission-denied') {
+                console.error('Permission denied: User may not have access to their own profile');
+                toast.error('Permission denied: Unable to load user profile');
+            } else if (error.code === 'unavailable') {
+                console.error('Firebase service unavailable');
+                toast.error('Service temporarily unavailable');
+            }
+
             return null;
         }
     };
@@ -415,8 +434,50 @@ export const AuthProvider = ({ children }) => {
                     console.warn('User authenticated but no Firestore document found');
                     console.log('This usually means the user was created in Firebase Auth but not in Firestore');
                     console.log('User needs to complete profile setup or be created by an admin');
-                    setCurrentUser(user);
-                    setUserProfile(null);
+
+                    // Try to create a basic user profile as fallback
+                    try {
+                        console.log('Attempting to create fallback user profile...');
+                        const fallbackUserData = {
+                            uid: user.uid,
+                            email: user.email,
+                            name: user.displayName || 'User',
+                            role: 'staff',
+                            department: '',
+                            skills: [],
+                            phoneNumber: '',
+                            isActive: true,
+                            profileComplete: false,
+                            preferences: {
+                                preferredShifts: [],
+                                maxHoursPerWeek: 40,
+                                availableDays: [],
+                                notifications: {
+                                    email: true,
+                                    push: true,
+                                    sms: false
+                                }
+                            },
+                            workloadMetrics: {
+                                totalShiftsCompleted: 0,
+                                totalHoursWorked: 0,
+                                averageRating: 0,
+                                lastShiftDate: null
+                            },
+                            createdAt: serverTimestamp(),
+                            updatedAt: serverTimestamp()
+                        };
+
+                        await setDoc(doc(db, 'users', user.uid), fallbackUserData);
+                        console.log('Fallback user profile created successfully');
+
+                        setCurrentUser(user);
+                        setUserProfile(fallbackUserData);
+                    } catch (fallbackError) {
+                        console.error('Failed to create fallback user profile:', fallbackError);
+                        setCurrentUser(user);
+                        setUserProfile(null);
+                    }
                 }
             } else {
                 setCurrentUser(null);

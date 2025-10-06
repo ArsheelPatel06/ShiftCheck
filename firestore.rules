@@ -2,49 +2,61 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users collection - users can read/write their own data, admins can delete any user
+    // Users collection - all authenticated users can read/write
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read: if request.auth != null && 
-        (resource.data.role == 'admin' || 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
-      // Allow admins to delete any user
+      // Allow all authenticated users to read/write user documents
+      // This is needed for admin creation and user management
+      allow read, write: if request.auth != null;
+      
+      // Only users can delete their own accounts
       allow delete: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        request.auth.uid == userId;
     }
     
-    // Shifts collection - authenticated users can read, admins can write
+    // Shifts collection - authenticated users can read and update
     match /shifts/{shiftId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && 
+      
+      // Allow all authenticated users to update shifts (for shift pickup)
+      // This is needed for staff to pick up shifts
+      allow update: if request.auth != null;
+      
+      // Only admins and managers can create/delete shifts
+      allow create, delete: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'manager'];
     }
     
-    // Leave requests - users can read/write their own, admins can read all
+    // Leave requests - all authenticated users can read/write
     match /leaveRequests/{requestId} {
-      allow read, write: if request.auth != null && 
-        (resource.data.userId == request.auth.uid || 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'manager']);
+      allow read, write: if request.auth != null;
     }
     
-    // Notifications - users can read their own, admins can write
+    // Leaves collection - all authenticated users can read/write
+    match /leaves/{leaveId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Notifications - users can read their own, all authenticated users can write
     match /notifications/{notificationId} {
       allow read: if request.auth != null && 
-        (resource.data.userId == request.auth.uid || 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'manager']);
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'manager'];
+        resource.data.userId == request.auth.uid;
+      
+      // Allow all authenticated users to write notifications
+      // This is needed for system notifications and shift pickup notifications
+      allow write: if request.auth != null;
     }
     
-    // Analytics - admins only
+    // Analytics - all authenticated users can read, only admins can write
     match /analytics/{document} {
-      allow read, write: if request.auth != null && 
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
-    // System settings - admins only
+    // System settings - all authenticated users can read, only admins can write
     match /settings/{document} {
-      allow read, write: if request.auth != null && 
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
@@ -56,14 +68,19 @@ service cloud.firestore {
          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
     }
     
-    // Admin requests - users can create their own, admins can read/update all
+    // Admin requests - all authenticated users can read/write
     match /adminRequests/{requestId} {
-      allow create: if request.auth != null && 
-        request.auth.uid == resource.data.userId;
-      allow read, update: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-      allow read: if request.auth != null && 
-        request.auth.uid == resource.data.userId;
+      allow read, write: if request.auth != null;
+    }
+    
+    // Shift swaps - all authenticated users can read/write
+    match /shiftSwaps/{swapId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // User activities - all authenticated users can read/write
+    match /user_activities/{userId} {
+      allow read, write: if request.auth != null;
     }
   }
 }

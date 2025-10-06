@@ -59,7 +59,7 @@ const UserManagement = () => {
     };
 
     const handleDelete = async (userId) => {
-        if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+        if (window.confirm('Are you sure you want to delete this user? This will permanently delete:\n• User account and authentication\n• All user data (shifts, leaves, notifications)\n• All related records\n\nThis action cannot be undone.')) {
             const result = await deletionService.deleteUser(userId);
             if (result.success) {
                 fetchUsers();

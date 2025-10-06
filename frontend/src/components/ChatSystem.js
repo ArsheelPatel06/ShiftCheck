@@ -88,6 +88,21 @@ const ChatSystem = ({ isOpen, onClose, isMinimized, onMinimize, onMaximize }) =>
                 }));
                 setMessages(messagesData.reverse());
                 setLoading(false);
+            }, (error) => {
+                console.error('Error fetching chat messages:', error);
+
+                // Handle specific Firebase errors
+                if (error.code === 'permission-denied') {
+                    console.warn('Permission denied: User may not have access to chat');
+                    toast.error('You do not have permission to access chat');
+                } else if (error.code === 'unavailable') {
+                    console.warn('Firebase service unavailable');
+                    toast.error('Chat service temporarily unavailable');
+                } else {
+                    toast.error('Failed to load chat messages');
+                }
+
+                setLoading(false);
             });
 
             return unsubscribe;

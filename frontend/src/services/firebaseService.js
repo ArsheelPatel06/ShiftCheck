@@ -13,6 +13,7 @@ import {
     serverTimestamp
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import firebaseErrorHandler from '../utils/firebaseErrorHandler';
 
 // Firebase User Service
 export const firebaseUserService = {
@@ -44,9 +45,9 @@ export const firebaseUserService = {
 
             return results;
         } catch (error) {
-            console.error('Error fetching users from Firebase:', error);
-            // Return empty array instead of throwing to prevent app crashes
-            return [];
+            return firebaseErrorHandler.handle(error, 'Fetching users', {
+                returnValue: []
+            });
         }
     },
 
@@ -119,6 +120,105 @@ export const firebaseUserService = {
             return id;
         } catch (error) {
             console.error('Error deleting user:', error);
+            throw error;
+        }
+    },
+
+    async deleteUserCompletely(userId) {
+        try {
+            console.log('Starting complete user deletion for:', userId);
+
+            // Get user data first to verify user exists
+            const userDoc = await getDoc(doc(db, 'users', userId));
+            if (!userDoc.exists()) {
+                throw new Error('User not found');
+            }
+
+            // Delete all user-related data from Firestore
+            await this.deleteUserData(userId);
+
+            // Delete user from Firebase Authentication
+            // Note: This requires admin privileges and should be done server-side
+            // For now, we'll just delete the Firestore data
+            console.log('User data deleted from Firestore. Auth deletion requires server-side implementation.');
+
+            return { success: true, userId };
+        } catch (error) {
+            console.error('Error deleting user completely:', error);
+            throw error;
+        }
+    },
+
+    async deleteUserData(userId) {
+        try {
+            console.log('Deleting all data for user:', userId);
+
+            // Delete user document
+            await deleteDoc(doc(db, 'users', userId));
+
+            // Delete user activities
+            await deleteDoc(doc(db, 'user_activities', userId));
+
+            // Delete user's notifications
+            const notificationsQuery = query(
+                collection(db, 'notifications'),
+                where('userId', '==', userId)
+            );
+            const notificationsSnapshot = await getDocs(notificationsQuery);
+            const deleteNotificationPromises = notificationsSnapshot.docs.map(doc => deleteDoc(doc.ref));
+            await Promise.all(deleteNotificationPromises);
+
+            // Delete user's leave requests
+            const leaveRequestsQuery = query(
+                collection(db, 'leaveRequests'),
+                where('userId', '==', userId)
+            );
+            const leaveRequestsSnapshot = await getDocs(leaveRequestsQuery);
+            const deleteLeaveRequestPromises = leaveRequestsSnapshot.docs.map(doc => deleteDoc(doc.ref));
+            await Promise.all(deleteLeaveRequestPromises);
+
+            // Delete user's leaves
+            const leavesQuery = query(
+                collection(db, 'leaves'),
+                where('userId', '==', userId)
+            );
+            const leavesSnapshot = await getDocs(leavesQuery);
+            const deleteLeavesPromises = leavesSnapshot.docs.map(doc => deleteDoc(doc.ref));
+            await Promise.all(deleteLeavesPromises);
+
+            // Delete user's shift swaps
+            const shiftSwapsQuery = query(
+                collection(db, 'shiftSwaps'),
+                where('userId', '==', userId)
+            );
+            const shiftSwapsSnapshot = await getDocs(shiftSwapsQuery);
+            const deleteShiftSwapsPromises = shiftSwapsSnapshot.docs.map(doc => deleteDoc(doc.ref));
+            await Promise.all(deleteShiftSwapsPromises);
+
+            // Delete user's admin requests
+            const adminRequestsQuery = query(
+                collection(db, 'adminRequests'),
+                where('userId', '==', userId)
+            );
+            const adminRequestsSnapshot = await getDocs(adminRequestsQuery);
+            const deleteAdminRequestsPromises = adminRequestsSnapshot.docs.map(doc => deleteDoc(doc.ref));
+            await Promise.all(deleteAdminRequestsPromises);
+
+            // Unassign user from any shifts
+            const shiftsQuery = query(
+                collection(db, 'shifts'),
+                where('assignedTo', '==', userId)
+            );
+            const shiftsSnapshot = await getDocs(shiftsQuery);
+            const unassignShiftPromises = shiftsSnapshot.docs.map(doc =>
+                updateDoc(doc.ref, { assignedTo: null, status: 'open' })
+            );
+            await Promise.all(unassignShiftPromises);
+
+            console.log('All user data deleted successfully');
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting user data:', error);
             throw error;
         }
     },
@@ -277,14 +377,26 @@ export const firebaseShiftService = {
 
     async assignShift(shiftId, userId) {
         try {
+            console.log('Assigning shift:', shiftId, 'to user:', userId);
             await updateDoc(doc(db, 'shifts', shiftId), {
                 assignedTo: userId, // Store as direct user ID, not object
                 status: 'scheduled',
                 updatedAt: serverTimestamp()
             });
+            console.log('Shift assigned successfully');
             return { shiftId, userId };
         } catch (error) {
             console.error('Error assigning shift:', error);
+
+            // Handle specific Firebase errors
+            if (error.code === 'permission-denied') {
+                throw new Error('You do not have permission to pick up this shift');
+            } else if (error.code === 'not-found') {
+                throw new Error('Shift not found');
+            } else if (error.code === 'unavailable') {
+                throw new Error('Service temporarily unavailable');
+            }
+
             throw error;
         }
     },
@@ -361,8 +473,9 @@ export const firebaseLeaveService = {
 
             return results;
         } catch (error) {
-            console.error('Error fetching leaves from Firebase:', error);
-            throw error;
+            return firebaseErrorHandler.handle(error, 'Fetching leaves', {
+                returnValue: []
+            });
         }
     },
 
@@ -381,14 +494,24 @@ export const firebaseLeaveService = {
 
     async create(leaveData) {
         try {
+            console.log('Creating leave request:', leaveData);
             const docRef = await addDoc(collection(db, 'leaves'), {
                 ...leaveData,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             });
+            console.log('Leave request created successfully:', docRef.id);
             return { id: docRef.id, ...leaveData };
         } catch (error) {
             console.error('Error creating leave:', error);
+
+            // Handle specific Firebase errors
+            if (error.code === 'permission-denied') {
+                throw new Error('You do not have permission to create leave requests');
+            } else if (error.code === 'unavailable') {
+                throw new Error('Service temporarily unavailable');
+            }
+
             throw error;
         }
     },

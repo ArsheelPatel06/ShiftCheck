@@ -29,7 +29,13 @@ const LoginPage = () => {
         } else if (currentUser && !userProfile) {
             // User is authenticated but no profile exists
             console.log('User authenticated but no profile found - this might be a new user or profile setup issue');
-            toast.error('Profile not found. Please contact an administrator to set up your account.');
+            console.log('Waiting for profile to load...');
+            // Don't show error immediately, wait a bit for profile to load
+            setTimeout(() => {
+                if (!userProfile) {
+                    toast.error('Profile not found. Please contact an administrator to set up your account.');
+                }
+            }, 3000);
         }
     }, [currentUser, userProfile, navigate]);
 

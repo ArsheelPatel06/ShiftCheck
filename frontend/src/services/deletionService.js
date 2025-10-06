@@ -22,7 +22,7 @@ class DeletionService {
 
         try {
             console.log('DeletionService: Starting shift deletion for ID:', shiftId);
-            
+
             // Check quota before deletion
             if (quotaService.isQuotaExceeded()) {
                 console.log('DeletionService: Quota exceeded, cannot delete');
@@ -81,7 +81,7 @@ class DeletionService {
                 toast.loading('Deleting user...', { id: 'delete-user' });
             }
 
-            await userService.delete(userId);
+            await userService.deleteCompletely(userId);
 
             // Log deletion
             this.logDeletion('user', userId);
@@ -155,7 +155,7 @@ class DeletionService {
 
         try {
             console.log('DeletionService: Starting notification deletion for ID:', notificationId);
-            
+
             if (showToast) {
                 toast.loading('Deleting notification...', { id: 'delete-notification' });
             }

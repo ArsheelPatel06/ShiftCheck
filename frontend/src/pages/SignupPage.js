@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Eye, EyeOff, Mail, Lock, User, Building, ArrowLeft, CheckCircle } from 'lucide-react';
 import Logo from '../components/Logo';
+import toast from 'react-hot-toast';
 
 const SignupPage = () => {
     const [formData, setFormData] = useState({
@@ -23,9 +24,20 @@ const SignupPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        console.log('SignupPage useEffect - currentUser:', currentUser, 'userProfile:', userProfile);
         if (currentUser && userProfile) {
             const redirectPath = userProfile.role === 'admin' ? '/admin-dashboard' : '/staff-dashboard';
+            console.log('Redirecting to:', redirectPath);
             navigate(redirectPath, { replace: true });
+        } else if (currentUser && !userProfile) {
+            console.log('User authenticated but no profile found - waiting for profile to load...');
+            // Wait a bit for profile to load
+            setTimeout(() => {
+                if (!userProfile) {
+                    console.error('Profile not found after signup');
+                    toast.error('Profile not found. Please try logging in again.');
+                }
+            }, 5000);
         }
     }, [currentUser, userProfile, navigate]);
 
@@ -116,6 +128,7 @@ const SignupPage = () => {
         setIsLoading(true);
 
         try {
+            console.log('Starting signup process...');
             // Always create as staff user
             await signup(formData.email, formData.password, {
                 name: formData.name,
@@ -123,9 +136,11 @@ const SignupPage = () => {
                 department: formData.department,
                 skills: formData.skills
             });
+            console.log('Signup completed, waiting for profile to load...');
             // Navigation will be handled by the useEffect hook
         } catch (error) {
             console.error('Signup failed:', error);
+            toast.error('Signup failed: ' + error.message);
         } finally {
             setIsLoading(false);
         }
