@@ -112,3 +112,4 @@ class QuotaManager {
 // Create singleton instance
 const quotaManager = new QuotaManager();
 export default quotaManager;
+

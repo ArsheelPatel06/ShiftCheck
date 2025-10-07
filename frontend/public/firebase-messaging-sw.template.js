@@ -140,3 +140,4 @@ function getNotificationUrl(data) {
             return '/staff-dashboard?tab=notifications';
     }
 }
+

@@ -310,3 +310,4 @@ class AnalyticsService {
 const analyticsService = new AnalyticsService();
 
 export default analyticsService;
+

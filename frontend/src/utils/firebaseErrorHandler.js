@@ -120,3 +120,4 @@ export const firebaseErrorHandler = {
 };
 
 export default firebaseErrorHandler;
+

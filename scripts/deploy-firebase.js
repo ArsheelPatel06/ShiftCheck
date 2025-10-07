@@ -56,3 +56,4 @@ try {
 console.log('\n🎉 Healthcare Shift Manager is now live!');
 console.log('📱 Check your Firebase console for the hosting URL');
 console.log('🔧 Configure your custom domain in Firebase Hosting settings');
+
